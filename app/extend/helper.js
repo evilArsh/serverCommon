@@ -57,9 +57,11 @@ module.exports = {
     reqParamSet(queryAndNumber) {
         const{app}=this;
         let { queryAfter, number } = queryAndNumber;
+        
         if (!isNaN(queryAfter) && !isNaN(number)) {
             number = number > app.config.defBlogNum ? app.config.defBlogNum : number;
             queryAfter = queryAfter < 0 ? 0 : queryAfter;
+         
         } else {
             queryAfter = 0;
             number = app.config.defBlogNum;
@@ -117,7 +119,7 @@ module.exports = {
         return {
             success: false,
             status: "002",
-            data: this.app.config.info.SUCCESS_TOKEN_SET
+            data: this.app.config.info.ERROR_TOKEN_REQUIRE
         }
     },
     errorMailFormate() {

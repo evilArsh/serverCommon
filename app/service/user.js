@@ -38,7 +38,9 @@ class UserService extends Service {
                 userPassword: data.userPassword,
                 userCreateAt: time,
                 userUpdateAt: timeO.getTime(),
-                userNickName:'未设置昵称用户'
+                userNickName:'未设置昵称',
+                userIsAdmin:'N',
+                userPhone:data.userPhone
             });
             if (results.affectedRows === 1) {
                 //cm
@@ -134,11 +136,33 @@ class UserService extends Service {
                 queryAfter,
                 number
             } = ctx.helper.reqParamSet(queryAndNumber);
-            let sql = `SELECT a.userNickName,a.userAvatar,b.blog_id,b.blog_type,b.blog_title,b.blog_time from user_info as a,user_blog as b where a.userID=b.userID AND a.userID=${id} ORDER BY b.blog_id DESC LIMIT ${queryAfter},${number} `;
+            let sql = `SELECT a.userNickName,a.userAvatar,b.blog_id,b.blog_type,b.blog_title,b.blog_time from user_verify as a,user_blog as b where a.userID=b.userID AND a.userID=${id} ORDER BY b.blog_id DESC LIMIT ${queryAfter},${number} `;
             app.mysql.escape(sql);
             const result = await app.mysql.query(sql);
             return ctx.helper.successUserInfo(result);
         } catch (err) {
+            throw err;
+        }
+    }
+    //++++++
+    async getUserInfoByToken(){
+        const {
+            ctx,
+            app
+        } = this;
+        const token=await ctx.service.token.getAccessToken();
+        try{
+            let result=await app.mysql.select('user_verify',{
+                columns:['userNickName','userAvatar','userIsAdmin'],
+                where:{
+                    userAccessToken:token
+                }
+            });
+            if(result.length){
+                return ctx.helper.successUserInfo(result[0]);
+            }
+            return ctx.helper.errorUserInfo();
+        }catch(err){
             throw err;
         }
     }

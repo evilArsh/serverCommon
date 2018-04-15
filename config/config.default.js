@@ -50,8 +50,21 @@ module.exports = appInfo => {
   config.jsonp = {
     csrf: true,
   };
+  //资源目录名字
+  config.sourceDir='resources';
   // token有效期,1小时
   config.tokenDelay = 3600000;
+  //egg-multipart
+  config.multipart={
+    fileExtensions:[
+      '.xls',
+      '.doc',
+      '.ppt',
+      '.docx',
+      '.xlsx',
+      '.pptx'
+    ]
+  };
   //默认获取首页博客的数量
   config.defBlogNum=20;
   config.status = {
@@ -72,7 +85,7 @@ module.exports = appInfo => {
     ERROR_USER_RELOGIN: '该用户已经登录',
     ERROR_USER_REGISTER: '此账号已被注册',
     ERROR_USER_LOGINOUT: '注销失败',
-    SUCCESS_USER_LOGINOUT:'注销成功',
+    SUCCESS_USER_LOGINOUT:'注销成功', 
     ERROR_USER_FORMATE: '非法的用户名或密码',
     ERROR_USER_IDENTIFY:'用户身份已过期,请重新登录',
     ERROR_USER_INFO:'获取用户资料失败',
