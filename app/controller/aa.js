@@ -40,9 +40,12 @@ class AAController extends Controller {
 
             let result;
             let func = ctx.query.func;
+            
             ctx.helper.xssFilter(ctx.query);
+            ctx.helper.xssFilter(ctx.params.id)
             switch (func) {
                 case "getMsg": ctx.body = await ctx.service.aa.getMsg(ctx.query); break;
+                case "getContent": ctx.body = await ctx.service.aa.getContent(ctx.query.id); break;
 
                 case "getBoard": ctx.body = await ctx.service.aa.setBoard(); break;
                 default:

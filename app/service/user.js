@@ -74,7 +74,6 @@ class UserService extends Service {
                 },
                 columns: ['userID', 'userMail', 'userPassword', 'userAccessToken','userNickName','userAvatar','userIsAdmin'/*cm*/]
             });
-            console.log('login service:' + JSON.stringify(results));
             // 用户名或密码错误
             // 加个Logger
             if (results.length !== 1) {

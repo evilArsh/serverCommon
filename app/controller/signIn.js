@@ -16,8 +16,6 @@ class SignInController extends Controller {
             ctx.validate(this.loginRule);
             ctx.helper.verifyMail(ctx.request.body.userMail);
             ctx.helper.xssFilter(ctx.request.body);
-            console.log(ctx.request.body);
-            
             ctx.body = await ctx.service.user.login(ctx.request.body);
         } catch (err) {
             // 如果参数校验未通过，将会抛出一个 status = 422 的异常

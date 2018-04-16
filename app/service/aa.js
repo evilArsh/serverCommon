@@ -70,11 +70,32 @@ class AaService extends Service {
             throw err;
         }
     }
+    async getContent(id) {
+        const { ctx, app } = this;
+        try {
+            const result = await app.mysql.select('matchs', {
+                columns: ['content','time'],
+                where:{
+                    'id':id
+                }
+            });
+            if(result.length){
+                return this.setStatus(true,'获取数据成功',result[0]);
+            }
+            return this.setStatus(false,'获取数据失败');
+        } catch (err) {
+            throw err;
+        }
+    }
     async upLoadMsg(param) {
         const {
             ctx,
             app
         } = this;
+        let usable=await ctx.service.token.isTokenUsable();
+        if(!usable){
+            return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
+        }
         const parts = this.ctx.multipart({ autoFields: true });
         let part;
         let result;

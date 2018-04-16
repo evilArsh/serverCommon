@@ -53,8 +53,8 @@ class TokenService extends Service {
     async isTokenUsable(_token) {
         try {
             let token;
-            if(_token){token=_token;}else{
-                token =this.getAccessToken();
+            if (_token) { token = _token; } else {
+                token = this.getAccessToken();
             }
             if (token !== undefined) {
                 let isUsable = await this._isTokenUsable(token);
@@ -89,12 +89,12 @@ class TokenService extends Service {
             let result = await app.mysql.update('user_verify', {
                 userUpdateAt: time
             }, {
-                where: {
-                    userAccessToken: token
-                }
-            });
-            return result.affectedRows===1;
-        } catch (err){
+                    where: {
+                        userAccessToken: token
+                    }
+                });
+            return result.affectedRows === 1;
+        } catch (err) {
             throw err;
         }
     }
@@ -113,6 +113,7 @@ class TokenService extends Service {
             throw err;
         }
     }
+ 
     //测试用
     async demoGetAccessToken() {
         const {

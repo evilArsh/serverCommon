@@ -34,13 +34,17 @@ module.exports = {
     // xss过滤
     // param required JSON
     xssFilter(data) {
-        Object.keys(data).forEach(key => {
-            if (data[key] === 'object') {
-                this.xssFilter(data[key]);
-            } else {
-                data[key] = this.escape(data[key]);
-            }
-        });
+        if (typeof data === 'object') {
+            Object.keys(data).forEach(key => {
+                if (data[key] === 'object') {
+                    this.xssFilter(data[key]);
+                } else {
+                    data[key] = this.escape(data[key]);
+                }
+            });
+        }else{
+            this.escape(data);
+        }
     },
     //时间是否过期
     isTimeDelay(old, news, time) {
@@ -48,20 +52,20 @@ module.exports = {
         if (isNaN(time)) {
             time = this.app.config.tokenDelay;
         }
-        if (isNaN(parseInt(old)) ||isNaN( parseInt(news))) {
+        if (isNaN(parseInt(old)) || isNaN(parseInt(news))) {
             return false;
         }
         return news - old >= this.app.config.tokenDelay ? true : false;
     },
     //对请求部分数据时body中所带的参数进行处理
     reqParamSet(queryAndNumber) {
-        const{app}=this;
+        const { app } = this;
         let { queryAfter, number } = queryAndNumber;
-        
+
         if (!isNaN(queryAfter) && !isNaN(number)) {
             number = number > app.config.defBlogNum ? app.config.defBlogNum : number;
             queryAfter = queryAfter < 0 ? 0 : queryAfter;
-         
+
         } else {
             queryAfter = 0;
             number = app.config.defBlogNum;
@@ -76,12 +80,12 @@ module.exports = {
             package: info
         }
     },
-    successUserInfo(info){
-        return{
-            success:true,
-            status:'002D',
+    successUserInfo(info) {
+        return {
+            success: true,
+            status: '002D',
             data: this.app.config.info.SUCCESS_USER_INFO,
-            package:info
+            package: info
         }
     },
     successUserBlog(info) {
@@ -100,12 +104,12 @@ module.exports = {
             package: info
         }
     },
-    successTokenSet(info){
-        return{
+    successTokenSet(info) {
+        return {
             success: true,
             status: "005D",
             data: this.app.config.info.SUCCESS_TOKEN_SET,
-            package:info
+            package: info
         }
     },
     successUserCreate() {
@@ -115,7 +119,7 @@ module.exports = {
             data: this.app.config.info.SUCCESS_USER_CREATE
         }
     },
-    errorTokenRequire(){
+    errorTokenRequire() {
         return {
             success: false,
             status: "002",
@@ -171,33 +175,33 @@ module.exports = {
             data: this.app.config.info.ERROR_DB_HANDLE
         }
     },
-    errorBlogContentParam(){
-      return{
-        success:false,
-        status:"010",
-        data:this.app.config.info.ERROR_BLOG_CONTENTPARAM
-      }
+    errorBlogContentParam() {
+        return {
+            success: false,
+            status: "010",
+            data: this.app.config.info.ERROR_BLOG_CONTENTPARAM
+        }
     },
-    errorBlogContent(){
-      return{
-        success:false,
-        status:"011",
-        data:this.app.config.info.ERROR_BLOG_CONTENT
-      }
+    errorBlogContent() {
+        return {
+            success: false,
+            status: "011",
+            data: this.app.config.info.ERROR_BLOG_CONTENT
+        }
     },
-    errorUserIdentify(){
-      return{
-        success:false,
-        status:"012",
-        data:this.app.config.info.ERROR_USER_IDENTIFY
-      }
+    errorUserIdentify() {
+        return {
+            success: false,
+            status: "012",
+            data: this.app.config.info.ERROR_USER_IDENTIFY
+        }
     },
-    errorUserInfo(){
-      return{
-        success:false,
-        status:"013",
-        data:this.app.config.info.ERROR_USER_INFO
-      }
+    errorUserInfo() {
+        return {
+            success: false,
+            status: "013",
+            data: this.app.config.info.ERROR_USER_INFO
+        }
     },
     errorTokenVerify() {
         return {
@@ -206,21 +210,21 @@ module.exports = {
             data: this.app.config.info.ERROR_TOKEN_VERIFY
         }
     },
-    successTokenVerify(){
+    successTokenVerify() {
         return {
             success: true,
             status: "015",
             data: this.app.config.info.SUCCESS_TOKEN_VERIFY
         }
     },
-    successUserLoginOut(){
+    successUserLoginOut() {
         return {
-            success:true,
-            status:'016',
-            data:this.app.config.info.SUCCESS_USER_LOGINOUT
+            success: true,
+            status: '016',
+            data: this.app.config.info.SUCCESS_USER_LOGINOUT
         }
     },
-    errorUserLoginOut(){
+    errorUserLoginOut() {
         return {
             success: false,
             status: '017',
