@@ -32,6 +32,10 @@ class TokenService extends Service {
                 app,
                 ctx
             } = this;
+            //突发状况
+            if(token===app.config.tokenFlag){
+                return false;
+            }
             let info = await app.mysql.select('user_verify', {
                 where: {
                     userAccessToken: token
@@ -87,6 +91,7 @@ class TokenService extends Service {
         let time = new Date().getTime() - (app.config.tokenDelay) * 2;
         try {
             let result = await app.mysql.update('user_verify', {
+                userAccessToken:app.config.tokenFlag,
                 userUpdateAt: time
             }, {
                     where: {

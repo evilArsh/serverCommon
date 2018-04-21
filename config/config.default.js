@@ -45,11 +45,13 @@ module.exports = appInfo => {
   credentials:true
 };
   // Nginx反向代理
-  config.proxy = true;
+  config.proxy = false;
   // JSONP CSRF验证
   config.jsonp = {
     csrf: true,
   };
+  //token失效标志
+  config.tokenFlag="unavailable";
   //资源目录名字
   config.sourceDir='resources';
   // token有效期,1小时

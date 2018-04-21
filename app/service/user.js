@@ -93,7 +93,7 @@ class UserService extends Service {
                 let info={
                     userNickName: results[0].userNickName,
                     userAvatar: results[0].userAvatar,
-                    admin: _admin
+                    userIsAdmin: _admin
                 };
                 //origional 
                 await ctx.service.token.setAccessToken(results[0].userID, new Date().getTime());
