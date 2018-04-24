@@ -70,6 +70,8 @@ module.exports = {
             queryAfter = 0;
             number = app.config.defBlogNum;
         }
+        queryAfter=parseInt(queryAfter);
+        number=parseInt(number);
         return { queryAfter, number };
     },
     successUserLogin(info) {

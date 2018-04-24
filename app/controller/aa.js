@@ -14,17 +14,24 @@ class AAController extends Controller {
         try {
 
             let result;
-            let func = ctx.query.func;
             ctx.helper.xssFilter(ctx.query);
+            ctx.helper.xssFilter(ctx.request.body);
+            let func = ctx.query.func;
+          
             switch (func) {
                 case "setMsg": ctx.body = await ctx.service.aa.upLoadMsg(ctx.query); break;
                 case "userUpload": ctx.body = await ctx.service.aa.userUpload(ctx.query); break;
 
-                case "setBoard": ctx.body = await ctx.service.aa.getBoard(); break;
+                case "addBoard": ctx.body = await ctx.service.aa.addBoard(ctx.request.body); break;
+                case "addBoardReply": ctx.body = await ctx.service.aa.addBoardReply(ctx.request.body); break;
+                case "starBoard": ctx.body = await ctx.service.aa.starBoard(ctx.request.body); break;
+                case "starBoardReply": ctx.body = await ctx.service.aa.starBoardReply(ctx.request.body); break;
+                case "delBoard": ctx.body = await ctx.service.aa.delBoard(ctx.request.body); break;
+                case "delBoardReply": ctx.body = await ctx.service.aa.delBoardReply(ctx.request.body); break;
+
                 case "delProject": ctx.body = await ctx.service.aa.delProject(ctx.request.body); break;
                 case "delProjectU": ctx.body = await ctx.service.aa.delProjectU(ctx.request.body); break;
                 case "check": ctx.body = await ctx.service.aa.check(ctx.request.body); break;
-                case "getBoard": ctx.body = await ctx.service.aa.setBoard(); break;
                 case "change": ctx.body = await ctx.service.aa.change(ctx.request.body); break;
                 default:
                     ctx.body = {success:false,data:'请求出错'};
@@ -44,15 +51,15 @@ class AAController extends Controller {
 
             let result;
             let func = ctx.query.func;
-            
-            ctx.helper.xssFilter(ctx.query);
             ctx.helper.xssFilter(ctx.params.id)
             switch (func) {
                 case "getMsg": ctx.body = await ctx.service.aa.getMsg(ctx.query); break;
                 case "getContent": ctx.body = await ctx.service.aa.getContent(ctx.query.id); break;
                 case "fileManage": ctx.body = await ctx.service.aa.fileManage(ctx.query); break;
+                case "getFiles": ctx.body = await ctx.service.aa.getFiles(ctx.query); break;
+                case "getBoard": ctx.body = await ctx.service.aa.getBoard(ctx.query); break;
 
-                case "getBoard": ctx.body = await ctx.service.aa.setBoard(); break;
+                case "getBoardReply": ctx.body = await ctx.service.aa.getBoardReply(ctx.query); break;
                 case "getUserData": ctx.body = await ctx.service.aa.getUserData(ctx.query); break;
                 default:
                     ctx.body = "{success:false,data:'请求出错'}";
