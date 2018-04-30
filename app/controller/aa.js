@@ -17,7 +17,8 @@ class AAController extends Controller {
             ctx.helper.xssFilter(ctx.query);
             ctx.helper.xssFilter(ctx.request.body);
             let func = ctx.query.func;
-          
+            console.log('请求参数：',func);
+            
             switch (func) {
                 case "setMsg": ctx.body = await ctx.service.aa.upLoadMsg(ctx.query); break;
                 case "userUpload": ctx.body = await ctx.service.aa.userUpload(ctx.query); break;
@@ -28,9 +29,11 @@ class AAController extends Controller {
                 case "starBoardReply": ctx.body = await ctx.service.aa.starBoardReply(ctx.request.body); break;
                 case "delBoard": ctx.body = await ctx.service.aa.delBoard(ctx.request.body); break;
                 case "delBoardReply": ctx.body = await ctx.service.aa.delBoardReply(ctx.request.body); break;
-
                 case "delProject": ctx.body = await ctx.service.aa.delProject(ctx.request.body); break;
+                case "sendUserBoard": ctx.body = await ctx.service.aa.sendUserBoard(ctx.request.body); break;
+                case "delUserBoard": ctx.body = await ctx.service.aa.delUserBoard(ctx.request.body); break;
                 case "delProjectU": ctx.body = await ctx.service.aa.delProjectU(ctx.request.body); break;
+                case "sendReply": ctx.body = await ctx.service.aa.sendReply(ctx.request.body); break;
                 case "check": ctx.body = await ctx.service.aa.check(ctx.request.body); break;
                 case "change": ctx.body = await ctx.service.aa.change(ctx.request.body); break;
                 default:
@@ -52,12 +55,17 @@ class AAController extends Controller {
             let result;
             let func = ctx.query.func;
             ctx.helper.xssFilter(ctx.params.id)
+            console.log('请求参数：',func);
+            
             switch (func) {
                 case "getMsg": ctx.body = await ctx.service.aa.getMsg(ctx.query); break;
                 case "getContent": ctx.body = await ctx.service.aa.getContent(ctx.query.id); break;
                 case "fileManage": ctx.body = await ctx.service.aa.fileManage(ctx.query); break;
                 case "getFiles": ctx.body = await ctx.service.aa.getFiles(ctx.query); break;
                 case "getBoard": ctx.body = await ctx.service.aa.getBoard(ctx.query); break;
+
+                case "getUserBoard": ctx.body = await ctx.service.aa.getUserBoard(ctx.query); break;
+                case "getUserBoardA": ctx.body = await ctx.service.aa.getUserBoardA(ctx.query); break;
 
                 case "getBoardReply": ctx.body = await ctx.service.aa.getBoardReply(ctx.query); break;
                 case "getUserData": ctx.body = await ctx.service.aa.getUserData(ctx.query); break;

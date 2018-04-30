@@ -207,9 +207,9 @@ class AaService extends Service {
                 'time': ctx.helper.dateFormate('yyyy-MM-dd', new Date())
             })
             if (rst.affectedRows === 1) {
-                return this.setStatus(true, '文件上传成功', files)
+                return this.setStatus(true, '文件上传成功')
             }
-            return this.setStatus(false, '文件上传失败', files)
+            return this.setStatus(false, '文件上传失败')
         } catch (err) {
             console.log("uploadERR:", err);
             throw err;
@@ -385,7 +385,7 @@ class AaService extends Service {
             if (rs.affectedRows === 1) {
                 return this.setStatus(true, '删除成功')
             }
-            return this.setStatus(false, '删除失败')
+            return this.setStatus(false, '删除失败，你不能删除别人的留言')
         } catch (err) {
             throw err;
         }
@@ -530,7 +530,7 @@ class AaService extends Service {
             app
         } = this;
         try {
-            
+
             let { queryAfter, number } = ctx.helper.reqParamSet(data);
             const result = await app.mysql.select('user_contentReply', {
                 columns: ['userID', 'replyID', 'attachContentID', 'contentID', 'content', 'starTime', 'time', 'userNickName', 'userNickNameReply'],
@@ -567,12 +567,14 @@ class AaService extends Service {
             let userID = await ctx.service.user.getUserIDByToken();
             const result = await app.mysql.delete('user_content', {
                 contentID: data.contentID,
-                userID: userID
+                userID: userID.package.userID
             });
             if (result.affectedRows === 1)
                 return { success: true, data: '留言删除成功' };
-            return { success: false, data: '留言删除失败' };
+            return { success: false, data: '留言删除失败,您不能删除别人的留言' };
         } catch (err) {
+            console.log(err);
+
             throw err;
         }
     }
@@ -591,8 +593,12 @@ class AaService extends Service {
             let userID = await ctx.service.user.getUserIDByToken();
             const result = await app.mysql.delete('user_contentReply', {
                 contentID: data.contentID,
-                userID: userID
+                userID: userID.package.userID
             });
+            if (result.affectedRows === 1)
+                return { success: true, data: '留言删除成功' };
+            return { success: false, data: '留言删除失败,您不能删除别人的留言' };
+
         } catch (err) {
             throw err
         }
@@ -610,16 +616,15 @@ class AaService extends Service {
             if (!usable) {
                 return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
             }
-            let sql = `update user_content set starTime=starTime+1 where contentID =${data.contentID}`;
-            sql = app.mysql.escape(sql);
-            let rst = app.mysql.query(sql);
-            if (rst.affectedRows === 1) {
-                return { success: true, data: '点赞成功' };
+            console.log(data.contentID);
 
-            }
-            return { success: false, data: '点赞失败' };
+            let sql = `update user_content set starTime=starTime+1 where contentID =${data.contentID}`;
+            let rst = app.mysql.query(sql);
+            return { success: true, data: '点赞成功' };
+
 
         } catch (err) {
+
             return { success: false, data: '点赞失败' };
         }
     }
@@ -634,14 +639,11 @@ class AaService extends Service {
             if (!usable) {
                 return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
             }
-            let sql = `update user_contentReply set starTime=starTime+1 where contentID =${data.contentID}`;
-            sql = app.mysql.escape(sql);
-            let rst = app.mysql.query(sql);
-            if (rst.affectedRows === 1) {
-                return { success: true, data: '点赞成功' };
+            let sql = 'update user_contentReply set starTime=starTime+1 where contentID =?';
+            // sql = app.mysql.escape(sql);
+            let rst = app.mysql.query(sql, [data.contentID]);
+            return { success: true, data: '点赞成功' };
 
-            }
-            return { success: false, data: '点赞失败' };
 
         } catch (err) {
             return { success: false, data: '点赞失败' };
@@ -676,7 +678,7 @@ class AaService extends Service {
 
         } catch (err) {
             console.log(err);
-            
+
             return { success: false, data: '留言失败' };
         }
     }
@@ -708,6 +710,91 @@ class AaService extends Service {
                 starTime: 0,
                 time: ctx.helper.dateFormate('yyyy-MM-dd hh:mm:ss', new Date())
             });
+            let id = await app.mysql.select('user_contentReply', {
+                columns: ['contentID'],
+                where: {
+                    userID: userID.package.userID,
+                    attachContentID: attachContentID,
+                    replyID: replyID,
+                    userNickNameReply: data.userNickNameReply,
+                    userNickName: data.userNickName,
+                }
+            });
+            if (rst.affectedRows === 1 && id.length) {
+                return { success: true, data: '留言成功', package: id[0].contentID };
+
+            }
+            return { success: false, data: '留言失败' };
+
+        } catch (err) {
+            console.log(err);
+
+            return { success: false, data: '留言失败' };
+        }
+    }
+    //用户添加留言
+    async sendUserBoard(data) {
+        const {
+            ctx,
+            app
+        } = this;
+        try {
+            let usable = await ctx.service.token.isTokenUsable();
+            if (!usable) {
+                return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
+            }
+            console.log(data.contentID);
+
+            let sql = `update user_content set starTime=starTime+1 where contentID =${data.contentID}`;
+            let rst = app.mysql.query(sql);
+            return { success: true, data: '点赞成功' };
+
+
+        } catch (err) {
+
+            return { success: false, data: '点赞失败' };
+        }
+    }
+    //赞子留言
+    async starBoardReply(data) {
+        const {
+            ctx,
+            app
+        } = this;
+        try {
+            let usable = await ctx.service.token.isTokenUsable();
+            if (!usable) {
+                return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
+            }
+            let sql = 'update user_contentReply set starTime=starTime+1 where contentID =?';
+            // sql = app.mysql.escape(sql);
+            let rst = app.mysql.query(sql, [data.contentID]);
+            return { success: true, data: '点赞成功' };
+
+
+        } catch (err) {
+            return { success: false, data: '点赞失败' };
+        }
+    }
+    //添加新的用户联系留言
+    //content
+    async sendUserBoard(data) {
+        const {
+            ctx,
+            app
+        } = this;
+        try {
+            let usable = await ctx.service.token.isTokenUsable();
+            if (!usable) {
+                return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
+            }
+            let userIDR = await ctx.service.user.getUserIDByToken();
+            let rst = await app.mysql.insert('user_message', {
+                userID: userIDR.package.userID,
+                userContent: data.userMsg,
+                replyContent: '暂未回复',
+                time: ctx.helper.dateFormate('yyyy-MM-dd hh:mm:ss', new Date())
+            });
             if (rst.affectedRows === 1) {
                 return { success: true, data: '留言成功' };
 
@@ -716,8 +803,144 @@ class AaService extends Service {
 
         } catch (err) {
             console.log(err);
-            
+
             return { success: false, data: '留言失败' };
+        }
+    }
+    //删除用户联系留言
+    //留言id
+    async delUserBoard(data) {
+        const {
+            ctx,
+            app
+        } = this;
+        try {
+            let usable = await ctx.service.token.isTokenUsable();
+            if (!usable) {
+                return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
+            }
+            let userIDR = await ctx.service.user.getUserIDByToken();
+            let rst = await app.mysql.delete('user_message', {
+                userID: userIDR.package.userID,
+                id: parseInt(data.id),
+            });
+            if (rst.affectedRows === 1) {
+                return { success: true, data: '删除成功' };
+
+            }
+            return { success: false, data: '删除失败' };
+
+        } catch (err) {
+            console.log(err);
+
+            return { success: false, data: '删除失败' };
+        }
+    }
+    //获取用户自己的留言
+    async getUserBoard(data) {
+        const {
+            ctx,
+            app
+        } = this;
+        try {
+            let usable = await ctx.service.token.isTokenUsable();
+            if (!usable) {
+                return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
+            }
+            let userIDR = await ctx.service.user.getUserIDByToken();
+            let { queryAfter, number } = ctx.helper.reqParamSet(data);
+            const result = await app.mysql.select('user_message', {
+                columns: ['id', 'userContent', 'replyContent', 'time'],
+                where: {
+                    userID: userIDR.package.userID
+                },
+                orders: [
+                    ['id', 'desc']
+                ],
+                limit: number,
+                offset: queryAfter
+            });
+            let sql2 = `select count(id)as number from user_message where userID=${userIDR.package.userID}`;
+            let count = await app.mysql.query(sql2);
+            result.push(count[0].number)
+
+            return { success: true, data: '留言获取成功', package: result };
+        } catch (err) {
+            throw err;
+        }
+    }
+    //管理员获取用户自己的留言
+    async getUserBoardA(data) {
+        const {
+            ctx,
+            app
+        } = this;
+        try {
+            let usable = await ctx.service.token.isTokenUsable();
+            if (!usable) {
+                return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
+            }
+            let ad = await this.isAdmin();
+            if (!ad) {
+                return this.setStatus(false, '非管理员禁止访问');
+            }
+            let { queryAfter, number } = ctx.helper.reqParamSet(data);
+            let sql = `
+            select a.id,a.userContent,a.replyContent,a.time,b.userNickName
+            from user_verify as b,user_message as a
+            where a.userID=b.userID order by a.id desc 
+            limit ${queryAfter},${number}
+            `;
+            // const result = await app.mysql.select('user_message', {
+            //     columns: ['id', 'userContent', 'replyContent', 'time'],
+            //     orders: [
+            //         ['id', 'desc']
+            //     ],
+            //     limit: number,
+            //     offset: queryAfter
+            // });
+            const result = await app.mysql.query(sql);
+            let sql2 = `select count(id)as number from user_message`;
+            let count = await app.mysql.query(sql2);
+            result.push(count[0].number)
+
+            return { success: true, data: '留言获取成功', package: result };
+        } catch (err) {
+            throw err;
+        }
+    }
+    //管理员回复
+    async sendReply(data) {
+        const {
+            ctx,
+            app
+        } = this;
+        try {
+            let usable = await ctx.service.token.isTokenUsable();
+            if (!usable) {
+                return ctx.helper.errorUserIdentify(app.config.ERROR_USER_IDENTIFY);
+            }
+            let ad = await this.isAdmin();
+            if (!ad) {
+                return this.setStatus(false, '非管理员禁止访问');
+            }
+            let userIDR = await ctx.service.user.getUserIDByToken();
+
+            const result = await app.mysql.update('user_message', {
+                replyID: userIDR.package.userID,
+                replyContent: data.content,
+            }, {
+                    where: {
+                        id: parseInt(data.id)
+                    }
+                });
+                if (result.affectedRows === 1) {
+                    return { success: true, data: '回复成功' };
+    
+                }
+                return { success: false, data: '回复失败' };
+        } catch (err) {
+            throw err;
         }
     }
 };
